@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Fishy game</string>
+    <string name="logo_alt">Fish logo</string>
 </resources>
