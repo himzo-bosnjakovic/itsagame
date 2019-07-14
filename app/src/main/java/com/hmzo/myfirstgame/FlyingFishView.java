@@ -1,7 +1,7 @@
 package com.hmzo.myfirstgame;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 public class FlyingFishView extends View {
     private Bitmap[] fish = new Bitmap[2];
@@ -29,7 +30,7 @@ public class FlyingFishView extends View {
     private Paint redPaint = new Paint();
 
     private boolean touch = false;
-    private int score;
+    private int score, lifeCounter;
 
     private Bitmap backgroundImage;
     private Paint scorePaint = new Paint();
@@ -61,6 +62,7 @@ public class FlyingFishView extends View {
 
         fishY = 550;
         score = 0;
+        lifeCounter = 3;
     }
 
     @Override
@@ -117,8 +119,16 @@ public class FlyingFishView extends View {
         //RED BALL SPAWN AND MOVEMENT
         redX = redX - redSpeed;
         if(hitBallChecker(redX, redY)) {
-            score = 0;
             redX = -100;
+            lifeCounter--;
+
+            if(lifeCounter==0) {
+                Toast.makeText(getContext(), "Game over", Toast.LENGTH_SHORT).show();
+
+                Intent gameOverIntent = new Intent(getContext(), GameOverActivity.class);
+                gameOverIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                getContext().startActivity(gameOverIntent);
+            }
         }
         if(redX < 0) {
             redX = canvasWidth + 21;
@@ -129,9 +139,20 @@ public class FlyingFishView extends View {
         //CANVAS DRAW TOPBAR
         canvas.drawText("Score : " + score, 20, 60, scorePaint);
 
-        canvas.drawBitmap(life[0], 400, 10, null);
-        canvas.drawBitmap(life[0], 475, 10, null);
-        canvas.drawBitmap(life[0], 550, 10, null);
+        //DISPLAY HEART OR NO HEART
+        for(int i=0; i<3; i++) {
+            int x = (int) (400 + life[0].getWidth() * 1.5 * i);
+            int y = 30;
+
+            if(i < lifeCounter) {
+                canvas.drawBitmap(life[0], x, y, null);
+            } else {
+                canvas.drawBitmap(life[1], x, y, null);
+            }
+        }
+
+
+
     }
 
     public boolean hitBallChecker(int x, int y) {
